@@ -10,6 +10,9 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
     token,
     process.env.ACCESS_TOKEN_SECRET as string,
     (err: any, decoded: any) => {
+      console.log(decoded);
+      req.id = decoded.id;
+      req.role = decoded.role;
       if (err) return res.sendStatus(403);
       next();
     }

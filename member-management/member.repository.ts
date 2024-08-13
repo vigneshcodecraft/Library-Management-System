@@ -2,7 +2,7 @@ import { count, eq, like, or } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { IPageRequest, IPagedResponse } from '../core/pagination.response';
 import { IRepository } from '../core/repository';
-import { MemberTable } from '../drizzle/schema';
+import { MembersTable } from '../drizzle/schema';
 import { IMember, IMemberBase } from './models/member.model';
 
 export class MemberRepository implements IRepository<IMemberBase, IMember> {
@@ -16,14 +16,14 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
       };
 
       const [result] = await this.db
-        .insert(MemberTable)
+        .insert(MembersTable)
         .values(newMember)
         .$returningId();
 
       const [insertedMember] = await this.db
         .select()
-        .from(MemberTable)
-        .where(eq(MemberTable.id, result.id));
+        .from(MembersTable)
+        .where(eq(MembersTable.id, result.id));
       // const insertedMember = await this.getById(queryResult.inserted);
 
       if (!insertedMember) {
@@ -51,9 +51,9 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
       };
 
       const updateMember = await this.db
-        .update(MemberTable)
+        .update(MembersTable)
         .set(updatedMember)
-        .where(eq(MemberTable.id, memberId));
+        .where(eq(MembersTable.id, memberId));
 
       const editedMember = await this.getById(memberId);
       if (!editedMember) {
@@ -72,8 +72,8 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
         return null;
       }
       const deleteMember = await this.db
-        .delete(MemberTable)
-        .where(eq(MemberTable.id, id));
+        .delete(MembersTable)
+        .where(eq(MembersTable.id, id));
 
       return existingMember;
     } catch (e: any) {
@@ -85,8 +85,8 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
     try {
       const [result] = await this.db
         .select()
-        .from(MemberTable)
-        .where(eq(MemberTable.id, id));
+        .from(MembersTable)
+        .where(eq(MembersTable.id, id));
 
       return (result as IMember) || null;
     } catch (e: any) {
@@ -99,21 +99,21 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
       const search = params.search?.toLowerCase();
       const whereExpression = search
         ? or(
-            like(MemberTable.firstName, `%${search}%`),
-            like(MemberTable.lastName, `%${search}%`)
+            like(MembersTable.firstName, `%${search}%`),
+            like(MembersTable.lastName, `%${search}%`)
           )
         : undefined;
 
       const members = await this.db
         .select()
-        .from(MemberTable)
+        .from(MembersTable)
         .where(whereExpression)
         .limit(params.limit)
         .offset(params.offset);
 
       const [result] = await this.db
         .select({ count: count() })
-        .from(MemberTable)
+        .from(MembersTable)
         .where(whereExpression);
 
       const totalCount = result.count;
@@ -136,8 +136,8 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
     try {
       const [result] = await this.db
         .select()
-        .from(MemberTable)
-        .where(eq(MemberTable.email, email));
+        .from(MembersTable)
+        .where(eq(MembersTable.email, email));
 
       return (result as IMember) || null;
     } catch (e: any) {
@@ -149,8 +149,8 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
     try {
       const [result] = await this.db
         .select()
-        .from(MemberTable)
-        .where(eq(MemberTable.refreshToken, refreshToken));
+        .from(MembersTable)
+        .where(eq(MembersTable.refreshToken, refreshToken));
 
       return (result as IMember) || null;
     } catch (e: any) {
@@ -168,9 +168,9 @@ export class MemberRepository implements IRepository<IMemberBase, IMember> {
       const updatedMember = { ...existingMember, refreshToken: null };
 
       await this.db
-        .update(MemberTable)
+        .update(MembersTable)
         .set(updatedMember)
-        .where(eq(MemberTable.id, memberId));
+        .where(eq(MembersTable.id, memberId));
 
       return updatedMember;
     } catch (error: any) {

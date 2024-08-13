@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { BooksTable } from '../database/src/drizzle/schema';
+import { BooksTable } from '../drizzle/schema';
 import { count, eq, like, or } from 'drizzle-orm';
 import chalk from 'chalk';
 import { IPageRequest, IPagedResponse } from '../core/pagination.response';
@@ -14,13 +14,13 @@ export class BookRepository implements IRepository<IBookBase, IBook> {
 
   async create(data: IBookBase): Promise<IBook> {
     try {
-      const newBookdata: Omit<IBook, 'id'> = {
+      const newBookData: Omit<IBook, 'id'> = {
         ...data,
         availableCopies: data.totalCopies,
       };
       const [queryResult] = await this.db
         .insert(BooksTable)
-        .values(newBookdata)
+        .values(newBookData)
         .$returningId();
       const [insertedBook] = await this.db
         .select()
@@ -28,7 +28,7 @@ export class BookRepository implements IRepository<IBookBase, IBook> {
         .where(eq(BooksTable.id, queryResult.id));
 
       if (!insertedBook) {
-        throw new Error('Failed to retrive the newly inserted Book');
+        throw new Error('Failed to retrieve the newly inserted Book');
       }
       return insertedBook;
     } catch (e: any) {

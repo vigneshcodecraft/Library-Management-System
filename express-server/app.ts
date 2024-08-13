@@ -3,14 +3,22 @@ import bookRouter from './routes/bookRouter';
 import { memberRouter } from './routes/memberRouter';
 import cookieParser from 'cookie-parser';
 import transactionRouter from './routes/transactionRouter';
-import { verifyJWT } from './middleware/verifyJWT';
 
+declare global {
+  namespace Express {
+    interface Request {
+      id: number;
+      role: string;
+    }
+  }
+}
 const app = express();
 
 const PORT = 3001;
 
 app.use(express.json());
 app.use(cookieParser());
+
 app.use('/books', bookRouter);
 
 app.use('/members', memberRouter);

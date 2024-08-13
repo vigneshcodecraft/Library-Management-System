@@ -1,16 +1,17 @@
 import {
   bigint,
   int,
+  mysqlEnum,
   mysqlTable,
   serial,
   varchar,
 } from 'drizzle-orm/mysql-core';
 
-export const BookTable = mysqlTable('books', {
+export const BooksTable = mysqlTable('books', {
   id: serial('id').primaryKey().autoincrement(),
   title: varchar('title', { length: 100 }).notNull(),
   author: varchar('author', { length: 150 }).notNull(),
-  publisher: varchar('publisher', { length: 50 }),
+  publisher: varchar('publisher', { length: 50 }).notNull(),
   genre: varchar('genre', { length: 31 }).notNull(),
   isbnNo: varchar('isbnNo', { length: 31 }).unique().notNull(),
   pages: int('pages').notNull(),
@@ -18,7 +19,7 @@ export const BookTable = mysqlTable('books', {
   availableCopies: int('availableCopies').notNull(),
 });
 
-export const MemberTable = mysqlTable('members', {
+export const MembersTable = mysqlTable('members', {
   id: serial('id').primaryKey().autoincrement(),
   firstName: varchar('firstName', { length: 50 }).notNull(),
   lastName: varchar('lastName', { length: 50 }).notNull(),
@@ -26,20 +27,21 @@ export const MemberTable = mysqlTable('members', {
   address: varchar('address', { length: 100 }).notNull(),
   password: varchar('password', { length: 100 }).notNull(),
   email: varchar('email', { length: 100 }).unique().notNull(),
-  refreshToken: varchar('refreshToken', { length: 100 }).unique(),
+  role: mysqlEnum('role', ['admin', 'user']).default('user'),
+  refreshToken: varchar('refreshToken', { length: 256 }).unique(),
 });
 
-export const TransactionTable = mysqlTable('transactions', {
+export const TransactionsTable = mysqlTable('transactions', {
   id: serial('id').primaryKey().autoincrement(),
   bookId: int('bookId')
     .notNull()
-    .references(() => BookTable.id, {
+    .references(() => BooksTable.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
   memberId: int('memberId')
     .notNull()
-    .references(() => MemberTable.id, {
+    .references(() => MembersTable.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),

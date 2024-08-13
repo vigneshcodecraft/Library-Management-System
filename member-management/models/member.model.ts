@@ -42,8 +42,8 @@ export const memberBaseSchema = z.object({
     .email({ message: 'Invalid email address' })
     .min(5, { message: 'Email must be at least 5 characters long' })
     .max(255, { message: 'Email must be no longer than 255 characters' }),
-
   password: z.string(),
+  role: z.enum(['admin', 'user']).default('user'),
 });
 
 export const memberSchema = memberBaseSchema.extend({

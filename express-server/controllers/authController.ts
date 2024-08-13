@@ -12,7 +12,6 @@ export const db: MySql2Database<Record<string, never>> = drizzle(pool);
 const memberRepo = new MemberRepository(db);
 
 export const handleLogin = async (req: Request, res: Response) => {
-  console.log(req.body);
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -29,12 +28,12 @@ export const handleLogin = async (req: Request, res: Response) => {
 
     if (match) {
       const accessToken = jwt.sign(
-        { id: foundUser.id, email: foundUser.email },
+        { id: foundUser.id, email: foundUser.email, role: foundUser.role },
         process.env.ACCESS_TOKEN_SECRET!,
-        { expiresIn: '30s' }
+        { expiresIn: '2m' }
       );
       const refreshToken = jwt.sign(
-        { id: foundUser.id, email: foundUser.email },
+        { id: foundUser.id, email: foundUser.email, role: foundUser.role },
         process.env.REFRESH_TOKEN_SECRET!,
         { expiresIn: '1d' }
       );

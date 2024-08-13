@@ -6,7 +6,7 @@ import {
   updateMemberHandler,
   deleteMemberHandler,
 } from '../controllers/memberController';
-import { handleRegister } from '../controllers/reqisterController';
+import { handleRegister } from '../controllers/registerController';
 import { handleLogin } from '../controllers/authController';
 import { validateMemberDataMiddleware } from '../middleware/middleware';
 import { handleLogout } from '../controllers/logoutController';
@@ -18,10 +18,20 @@ export const memberRouter = express.Router();
 memberRouter.post('/register', handleRegister);
 memberRouter.post('/login', handleLogin);
 memberRouter.post('/logout', handleLogout);
-memberRouter.get('/', verifyJWT,listMembersHandler);
-memberRouter.get('/:id', verifyJWT,getMemberByIdHandler);
-memberRouter.post('/', verifyJWT,validateMemberDataMiddleware, createMemberHandler);
-memberRouter.patch('/:id',verifyJWT, validateMemberDataMiddleware, updateMemberHandler);
-memberRouter.delete('/:id',verifyJWT, deleteMemberHandler);
+memberRouter.get('/', verifyJWT, listMembersHandler);
+memberRouter.get('/:id', verifyJWT, getMemberByIdHandler);
+memberRouter.post(
+  '/',
+  verifyJWT,
+  validateMemberDataMiddleware,
+  createMemberHandler
+);
+memberRouter.patch(
+  '/:id',
+  verifyJWT,
+  validateMemberDataMiddleware,
+  updateMemberHandler
+);
+memberRouter.delete('/:id', verifyJWT, deleteMemberHandler);
 
 app.use(memberRouter);

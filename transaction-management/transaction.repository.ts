@@ -6,7 +6,7 @@ import { MySqlQueryGenerator } from '../libs/mysql-query-generator';
 import { PageOption } from '../libs/types';
 import { ITransaction, ITransactionBase } from './models/transaction.model';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { BookTable, TransactionTable } from '../drizzle/schema';
+import { BooksTable, TransactionsTable } from '../drizzle/schema';
 import { and, count, eq } from 'drizzle-orm';
 
 const {
@@ -30,23 +30,23 @@ export class TransactionRepository
       };
 
       const [result] = await this.db
-        .insert(TransactionTable)
+        .insert(TransactionsTable)
         .values(transaction)
         .$returningId();
       const [insertedTransaction] = await this.db
         .select()
-        .from(TransactionTable)
-        .where(eq(TransactionTable.id, result.id));
+        .from(TransactionsTable)
+        .where(eq(TransactionsTable.id, result.id));
       //const insertedTransaction = await this.getById(result.insertId);
       const [bookDetails] = await this.db
         .select()
-        .from(BookTable)
-        .where(eq(BookTable.id, insertedTransaction.bookId));
+        .from(BooksTable)
+        .where(eq(BooksTable.id, insertedTransaction.bookId));
 
       await this.db
-        .update(BookTable)
+        .update(BooksTable)
         .set({ availableCopies: bookDetails.availableCopies - 1 })
-        .where(eq(BookTable.id, bookDetails.id));
+        .where(eq(BooksTable.id, bookDetails.id));
 
       if (!insertedTransaction) {
         throw new Error('Failed to retrieve the newly inserted transaction');
@@ -61,8 +61,8 @@ export class TransactionRepository
     try {
       const [result] = await this.db
         .select()
-        .from(TransactionTable)
-        .where(eq(TransactionTable.id, id));
+        .from(TransactionsTable)
+        .where(eq(TransactionsTable.id, id));
       return (result as ITransaction) || null;
     } catch (e: any) {
       throw new Error(`Selection failed: ${e.message}`);
@@ -75,28 +75,28 @@ export class TransactionRepository
   ): Promise<ITransaction | null> {
     try {
       await this.db
-        .update(TransactionTable)
+        .update(TransactionsTable)
         .set({ returnDate: returnDate, status: 'Returned' })
         .where(
           and(
-            eq(TransactionTable.id, transactionId),
-            eq(TransactionTable.status, 'Issued')
+            eq(TransactionsTable.id, transactionId),
+            eq(TransactionsTable.status, 'Issued')
           )
         );
       const [updatedTransaction] = await this.db
         .select()
-        .from(TransactionTable)
-        .where(eq(TransactionTable.id, transactionId));
+        .from(TransactionsTable)
+        .where(eq(TransactionsTable.id, transactionId));
 
       const [bookDetails] = await this.db
         .select()
-        .from(BookTable)
-        .where(eq(BookTable.id, updatedTransaction.bookId));
+        .from(BooksTable)
+        .where(eq(BooksTable.id, updatedTransaction.bookId));
 
       await this.db
-        .update(BookTable)
+        .update(BooksTable)
         .set({ availableCopies: bookDetails.availableCopies + 1 })
-        .where(eq(BookTable.id, bookDetails.id));
+        .where(eq(BooksTable.id, bookDetails.id));
 
       if (!updatedTransaction) {
         throw new Error('Failed to retrieve the newly updated transaction');
@@ -116,13 +116,13 @@ export class TransactionRepository
 
       const transactions = await this.db
         .select()
-        .from(TransactionTable)
+        .from(TransactionsTable)
         .limit(params.limit)
         .offset(params.offset);
 
       const [totalTransactionRows] = await this.db
         .select({ count: count() })
-        .from(TransactionTable);
+        .from(TransactionsTable);
 
       const totalTransaction = totalTransactionRows.count;
       return {
