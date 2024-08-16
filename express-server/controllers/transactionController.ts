@@ -46,8 +46,8 @@ export const listTransactionsHandler = async (
       limit: limit,
       offset: offset,
     });
-    if (transactionRepo) {
-      response.status(200).json(transactionRepo);
+    if (transactions) {
+      response.status(200).json(transactions);
     } else {
       response.status(404).json({ error: 'Transaction not found' });
     }
@@ -79,8 +79,11 @@ export const returnBookHandler = async (
   const transactionId = Number(request.params.id);
 
   try {
-    const returnDate: string = request.body;
+    const { returnDate } = request.body;
+    console.log(returnDate);
     const result = await transactionRepo.update(transactionId, returnDate);
+    console.log(result);
+
     if (result) {
       response.status(200).json({ message: 'Book returned' });
     } else {

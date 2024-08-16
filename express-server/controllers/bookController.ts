@@ -77,7 +77,6 @@ export const updateBookHandler = async (
   response: Response
 ) => {
   const bookId = Number(request.params.id);
-
   try {
     const book: IBook = request.body;
     const result = await bookRepo.update(bookId, book);
@@ -97,7 +96,6 @@ export const deleteBookHandler = async (
   response: Response
 ) => {
   const bookId = Number(request.params.id);
-
   try {
     const result = await bookRepo.delete(bookId);
     if (result) {

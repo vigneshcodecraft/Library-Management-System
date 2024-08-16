@@ -18,7 +18,6 @@ export const handleRefreshToken = async (req: Request, res: Response) => {
 
   try {
     const foundUser = await memberRepo.getByRefreshToken(refreshToken);
-
     if (!foundUser) return res.sendStatus(403);
 
     jwt.verify(
@@ -30,7 +29,7 @@ export const handleRefreshToken = async (req: Request, res: Response) => {
         const accessToken = jwt.sign(
           { id: foundUser.id, email: foundUser.email },
           process.env.ACCESS_TOKEN_SECRET!,
-          { expiresIn: '2m' }
+          { expiresIn: '5m' }
         );
 
         res.json({ accessToken });

@@ -4,14 +4,6 @@ import { memberRouter } from './routes/memberRouter';
 import cookieParser from 'cookie-parser';
 import transactionRouter from './routes/transactionRouter';
 
-declare global {
-  namespace Express {
-    interface Request {
-      id: number;
-      role: string;
-    }
-  }
-}
 const app = express();
 
 const PORT = 3001;

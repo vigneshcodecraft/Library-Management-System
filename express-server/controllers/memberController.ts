@@ -8,7 +8,7 @@ import { AppEnvs } from '../../read-env';
 export const pool = mysql.createPool(AppEnvs.DATABASE_URL);
 export const db: MySql2Database<Record<string, never>> = drizzle(pool);
 
-const memberRepo = new MemberRepository(db);
+export const memberRepo = new MemberRepository(db);
 
 export const getMemberByIdHandler = async (
   request: Request,
@@ -18,7 +18,7 @@ export const getMemberByIdHandler = async (
   if (isNaN(memberId)) {
     return response.status(400).json({ error: 'Invalid Member ID' });
   }
-  if (memberId !== request.id && request.role === 'user') {
+  if (memberId !== request.user.id && request.user.role === 'user') {
     return response
       .status(403)
       .json({ error: 'You are not allowed to access this information' });
@@ -43,9 +43,6 @@ export const listMembersHandler = async (
   const search = (request.query.search as string) || '';
   const limit = Number(request.query.limit) || 10;
   const offset = Number(request.query.offset) || 0;
-  if (request.role === 'user') {
-    return response.status(403).json({ error: 'Access denied' });
-  }
   try {
     const members = await memberRepo.list({
       search: search,
@@ -63,9 +60,6 @@ export const createMemberHandler = async (
   request: Request,
   response: Response
 ) => {
-  if (request.role === 'user') {
-    return response.status(403).json({ message: 'Access denied' });
-  }
   try {
     const memberData: IMemberBase = request.body;
     const result = await memberRepo.create(memberData);
@@ -85,10 +79,6 @@ export const updateMemberHandler = async (
   if (isNaN(memberId)) {
     return response.status(400).json({ error: 'Invalid Member ID' });
   }
-  if (memberId !== request.id && request.role === 'user') {
-    return response.status(403).json({ error: 'Access denied' });
-  }
-
   try {
     const memberData: IMemberBase = request.body;
     const result = await memberRepo.update(memberId, memberData);
@@ -110,9 +100,6 @@ export const deleteMemberHandler = async (
   const memberId = Number(request.params.id);
   if (isNaN(memberId)) {
     return response.status(400).json({ error: 'Invalid Member ID' });
-  }
-  if (memberId !== request.id && request.role === 'user') {
-    return response.status(403).json({ error: 'Access denied' });
   }
   try {
     const result = await memberRepo.delete(memberId);
